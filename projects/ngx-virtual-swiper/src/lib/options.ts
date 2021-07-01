@@ -12,5 +12,8 @@ export class NgxVirtualSwiperOptions {
     /** prevent all type of clicks (e.g. links, Angular`s click) */
     public preventClicks = true;
 
+    /** The minimum amount you have to drag in order for swiping to begin. */
+    public minimumDragPxToSwipe = 0;
+
     constructor() { }
 }

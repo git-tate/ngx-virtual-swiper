@@ -1,6 +1,6 @@
 import { Directionality } from '@angular/cdk/bidi';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { Directive, HostListener, Inject, Input, OnDestroy, OnInit, Optional } from '@angular/core';
+import { Directive, EventEmitter, HostListener, Inject, Input, OnDestroy, OnInit, Optional, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { NgxVirtualSwiperOptions } from './options';
 import { IPositionEvent } from './position-event';
@@ -15,6 +15,9 @@ const HORIZONTAL_ORIENTATION = 'horizontal';
 export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
 
     @Input() public itemSize: number;
+    @Output() public swipeStart: EventEmitter<boolean> = new EventEmitter();
+    @Output() public swipeEnd: EventEmitter<boolean> = new EventEmitter();
+
     public readonly subscription = new Subscription();
     public index: number;
     public swiped: boolean;
@@ -22,6 +25,8 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
     public clientY: number;
     public prevClientX: number;
     public prevClientY: number;
+    public delta: number;
+    public deltaFree: boolean;
 
     constructor(
         @Optional() @Inject(Directionality) private dir: Directionality,
@@ -86,8 +91,14 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
             const c = this.rtl ? -1 : 1;
             const delta = (this.clientX - e.clientX) * c;
             const value = offset + delta;
-            if (value >= 0 && value <= this.scrollSize) {
-                this.cdk.scrollToOffset(Math.abs(value));
+            this.delta = Math.abs(delta);
+            if (value >= 0 && value <= this.scrollSize && (this.deltaFree || this.delta >= this.options.minimumDragPxToSwipe)) {
+                this.cdk.scrollToOffset(!this.deltaFree ? (offset + (delta * c))
+                    : Math.abs(value));
+                if (!this.deltaFree ) {
+                    this.deltaFree = true;
+                    this.swipeStart.emit(true);
+                }
                 this.clientX = e.clientX;
             }
         }
@@ -97,8 +108,14 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
         if (e) {
             const offset = this.cdk.measureScrollOffset();
             const value = offset - e.clientY + this.clientY;
-            if (value >= 0 && value <= this.scrollSize) {
-                this.cdk.scrollToOffset(value);
+            this.delta = e.clientY >= this.clientY ? e.clientY - this.clientY : this.clientY - e.clientY;
+            if (value >= 0 && value <= this.scrollSize && (this.deltaFree || this.delta >= this.options.minimumDragPxToSwipe)) {
+                this.cdk.scrollToOffset(!this.deltaFree ? (offset - ( e.clientY >= this.clientY ? this.delta : this.delta * -1))
+                    : value);
+                if (!this.deltaFree ) {
+                    this.deltaFree = true;
+                    this.swipeStart.emit(true);
+                }
                 this.clientY = e.clientY;
             }
         }
@@ -110,6 +127,8 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
         this.clientY = e.clientY;
         this.prevClientX = e.clientX;
         this.prevClientY = e.clientY;
+        this.delta = 0;
+        this.deltaFree = false;
     }
 
     public move = (e: IPositionEvent): void => {
@@ -128,8 +147,11 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
     }
 
     public finalize = (): void => {
-        if (this.options.finalize) {
-            this.scrollToNearestIndex();
+        if (this.deltaFree) {
+            if (this.options.finalize) {
+                this.scrollToNearestIndex();
+            }
+            this.swipeEnd.emit(true);
         }
     }
 
