@@ -139,38 +139,38 @@
         }
       }
     },
-    "ngx-virtual-swiper": {
-      "root": "projects/ngx-virtual-swiper",
-      "sourceRoot": "projects/ngx-virtual-swiper/src",
+    "ngx-virtual-swiper-plus": {
+      "root": "projects/ngx-virtual-swiper-plus",
+      "sourceRoot": "projects/ngx-virtual-swiper-plus/src",
       "projectType": "library",
       "prefix": "ngx",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-ng-packagr:build",
           "options": {
-            "tsConfig": "projects/ngx-virtual-swiper/tsconfig.lib.json",
-            "project": "projects/ngx-virtual-swiper/ng-package.json"
+            "tsConfig": "projects/ngx-virtual-swiper-plus/tsconfig.lib.json",
+            "project": "projects/ngx-virtual-swiper-plus/ng-package.json"
           },
           "configurations": {
             "production": {
-              "tsConfig": "projects/ngx-virtual-swiper/tsconfig.lib.prod.json"
+              "tsConfig": "projects/ngx-virtual-swiper-plus/tsconfig.lib.prod.json"
             }
           }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/ngx-virtual-swiper/src/test.ts",
-            "tsConfig": "projects/ngx-virtual-swiper/tsconfig.spec.json",
-            "karmaConfig": "projects/ngx-virtual-swiper/karma.conf.js"
+            "main": "projects/ngx-virtual-swiper-plus/src/test.ts",
+            "tsConfig": "projects/ngx-virtual-swiper-plus/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-virtual-swiper-plus/karma.conf.js"
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "projects/ngx-virtual-swiper/tsconfig.lib.json",
-              "projects/ngx-virtual-swiper/tsconfig.spec.json"
+              "projects/ngx-virtual-swiper-plus/tsconfig.lib.json",
+              "projects/ngx-virtual-swiper-plus/tsconfig.spec.json"
             ],
             "exclude": [
               "**/node_modules/**"

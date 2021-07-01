@@ -5,10 +5,10 @@
     "ng": "ng",
     "start": "ng serve --port=9900",
     "build": "ng build",
-    "build:lib": "ng build ngx-virtual-swiper --prod",
+    "build:lib": "ng build ngx-virtual-swiper-plus --prod",
     "test": "ng test --watch=false",
-    "test:lib": "ng test ngx-virtual-swiper --watch=false",
-    "test:lib:watch": "ng test ngx-virtual-swiper",
+    "test:lib": "ng test ngx-virtual-swiper-plus --watch=false",
+    "test:lib:watch": "ng test ngx-virtual-swiper-plus",
     "lint": "ng lint",
     "e2e": "ng e2e"
   },

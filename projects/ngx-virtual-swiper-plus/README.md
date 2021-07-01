@@ -3,20 +3,20 @@
 Swiper with virtual scroll.
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/ngx-virtual-swiper">
+  <a href="https://www.npmjs.com/package/ngx-virtual-swiper-plus">
     <img alt="npm version" src="https://img.shields.io/npm/v/ngx-virtual-swiper.svg">
   </a>
-  <a href="https://www.npmjs.com/package/ngx-virtual-swiper">
+  <a href="https://www.npmjs.com/package/ngx-virtual-swiper-plus">
     <img alt="npm" src="https://img.shields.io/npm/dm/ngx-virtual-swiper.svg">
   </a>
-  <a href="https://github.com/michael-vasyliv/ngx-virtual-swiper/blob/master/LICENSE">
+  <a href="https://github.com/git-tate/ngx-virtual-swiper/blob/master/LICENSE">
     <img alt="licence" src="https://img.shields.io/npm/l/ngx-virtual-swiper.svg">
   </a>
 </p>
 
 ## [Demo](https://stackblitz.com/edit/angular-5qz2y7)
 
-## [Examples](https://github.com/michael-vasyliv/ngx-virtual-swiper/tree/master/src/app/demos)
+## [Examples](https://github.com/git-tate/ngx-virtual-swiper/tree/master/src/app/demos)
 
 ## Getting Started
 
