@@ -85,6 +85,10 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
         return this.cdk.getDataLength() * this.itemSize;
     }
 
+    public get isSwiping() {
+        return this.deltaFree === true;
+    }
+
     public mousemoveX = (e: IPositionEvent): void => {
         if (e) {
             const offset = this.cdk.measureScrollOffset();
@@ -151,6 +155,7 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
             if (this.options.finalize) {
                 this.scrollToNearestIndex();
             }
+            this.deltaFree = false;
             this.swipeEnd.emit(true);
         }
     }
