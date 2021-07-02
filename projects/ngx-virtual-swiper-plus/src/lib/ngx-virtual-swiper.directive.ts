@@ -20,6 +20,7 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
 
     @Output() public swipeBeforeStart: EventEmitter<IPositionEvent> = new EventEmitter();
     @Output() public swipeStart: EventEmitter<boolean> = new EventEmitter();
+    @Output() public swipeUnlocked: EventEmitter<boolean> = new EventEmitter();
     @Output() public swipeEnd: EventEmitter<boolean> = new EventEmitter();
     @Output() public swipeAfterEnd: EventEmitter<boolean> = new EventEmitter();
 
@@ -109,6 +110,7 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
                         : Math.abs(value));
                     if (!this._swipeUnlocked ) {
                         this._swipeUnlocked = true;
+                        this.swipeUnlocked.emit(true);
                     }
                     this.clientX = e.clientX;
                 }
@@ -127,6 +129,7 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
                         : value);
                     if (!this._swipeUnlocked ) {
                         this._swipeUnlocked = true;
+                        this.swipeUnlocked.emit(true);
                     }
                     this.clientY = e.clientY;
                 }
