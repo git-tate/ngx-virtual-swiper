@@ -15,6 +15,9 @@ const HORIZONTAL_ORIENTATION = 'horizontal';
 export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
 
     @Input() public itemSize: number;
+    @Input() public enabled = true;
+
+    @Output() public swipeBeforeStart: EventEmitter<IPositionEvent> = new EventEmitter();
     @Output() public swipeStart: EventEmitter<boolean> = new EventEmitter();
     @Output() public swipeEnd: EventEmitter<boolean> = new EventEmitter();
 
@@ -25,8 +28,9 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
     public clientY: number;
     public prevClientX: number;
     public prevClientY: number;
-    public delta: number;
-    public deltaFree: boolean;
+
+    private _delta: number;
+    private _swipeUnlocked: boolean;
 
     constructor(
         @Optional() @Inject(Directionality) private dir: Directionality,
@@ -45,9 +49,9 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
         this.subscription.unsubscribe();
     }
 
-    @HostListener('mousedown', ['$event']) public onMousedown = (e): void => this.start(getClickPositions(e));
+    @HostListener('mousedown', ['$event']) public onMousedown = (e): void => this.start(e);
 
-    @HostListener('touchstart', ['$event']) public onTouchstart = (e): void => this.start(getTouchPositions(e));
+    @HostListener('touchstart', ['$event']) public onTouchstart = (e): void => this.start(e);
 
     @HostListener('mousemove', ['$event']) public onMousemove = (e): void => this.move(getClickPositions(e));
 
@@ -86,53 +90,61 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
     }
 
     public get isSwiping() {
-        return this.deltaFree === true;
+        return this._swipeUnlocked === true;
     }
 
     public mousemoveX = (e: IPositionEvent): void => {
-        if (e) {
-            const offset = this.cdk.measureScrollOffset();
-            const c = this.rtl ? -1 : 1;
-            const delta = (this.clientX - e.clientX) * c;
-            const value = offset + delta;
-            this.delta = Math.abs(delta);
-            if (value >= 0 && value <= this.scrollSize && (this.deltaFree || this.delta >= this.options.minimumDragPxToSwipe)) {
-                this.cdk.scrollToOffset(!this.deltaFree ? (offset + (delta * c))
-                    : Math.abs(value));
-                if (!this.deltaFree ) {
-                    this.deltaFree = true;
-                    this.swipeStart.emit(true);
+        if (this.enabled && this.swiped) {
+            if (e) {
+                const offset = this.cdk.measureScrollOffset();
+                const c = this.rtl ? -1 : 1;
+                const delta = (this.clientX - e.clientX) * c;
+                const value = offset + delta;
+                this._delta = Math.abs(delta);
+                if (value >= 0 && value <= this.scrollSize && (this._swipeUnlocked || this._delta >= this.options.minimumDragPxToSwipe)) {
+                    this.cdk.scrollToOffset(!this._swipeUnlocked ? (offset + (delta * c))
+                        : Math.abs(value));
+                    if (!this._swipeUnlocked ) {
+                        this._swipeUnlocked = true;
+                        this.swipeStart.emit(true);
+                    }
+                    this.clientX = e.clientX;
                 }
-                this.clientX = e.clientX;
             }
         }
     }
 
     public mousemoveY = (e: IPositionEvent): void => {
-        if (e) {
-            const offset = this.cdk.measureScrollOffset();
-            const value = offset - e.clientY + this.clientY;
-            this.delta = e.clientY >= this.clientY ? e.clientY - this.clientY : this.clientY - e.clientY;
-            if (value >= 0 && value <= this.scrollSize && (this.deltaFree || this.delta >= this.options.minimumDragPxToSwipe)) {
-                this.cdk.scrollToOffset(!this.deltaFree ? (offset - ( e.clientY >= this.clientY ? this.delta : this.delta * -1))
-                    : value);
-                if (!this.deltaFree ) {
-                    this.deltaFree = true;
-                    this.swipeStart.emit(true);
+        if (this.enabled && this.swiped) {
+            if (e) {
+                const offset = this.cdk.measureScrollOffset();
+                const value = offset - e.clientY + this.clientY;
+                this._delta = e.clientY >= this.clientY ? e.clientY - this.clientY : this.clientY - e.clientY;
+                if (value >= 0 && value <= this.scrollSize && (this._swipeUnlocked || this._delta >= this.options.minimumDragPxToSwipe)) {
+                    this.cdk.scrollToOffset(!this._swipeUnlocked ? (offset - ( e.clientY >= this.clientY ? this._delta : this._delta * -1))
+                        : value);
+                    if (!this._swipeUnlocked ) {
+                        this._swipeUnlocked = true;
+                        this.swipeStart.emit(true);
+                    }
+                    this.clientY = e.clientY;
                 }
-                this.clientY = e.clientY;
             }
         }
     }
 
     public start = (e: IPositionEvent): void => {
-        this.toggleSwiped(true);
-        this.clientX = e.clientX;
-        this.clientY = e.clientY;
-        this.prevClientX = e.clientX;
-        this.prevClientY = e.clientY;
-        this.delta = 0;
-        this.deltaFree = false;
+        this.swipeBeforeStart.emit(e);
+        if (this.enabled) {
+            const position = getTouchPositions(e);
+            this.toggleSwiped(true);
+            this.clientX = position.clientX;
+            this.clientY = position.clientY;
+            this.prevClientX = position.clientX;
+            this.prevClientY = position.clientY;
+            this._delta = 0;
+            this._swipeUnlocked = false;
+        }
     }
 
     public move = (e: IPositionEvent): void => {
@@ -151,11 +163,11 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
     }
 
     public finalize = (): void => {
-        if (this.deltaFree) {
+        if (this._swipeUnlocked) {
             if (this.options.finalize) {
                 this.scrollToNearestIndex();
             }
-            this.deltaFree = false;
+            this._swipeUnlocked = false;
             this.swipeEnd.emit(true);
         }
     }
