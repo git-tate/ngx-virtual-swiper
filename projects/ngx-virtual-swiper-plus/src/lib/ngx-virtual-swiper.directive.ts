@@ -9,6 +9,7 @@ import { getClickPositions, getTouchPositions, isNumber } from './utils';
 const VERTICAL_ORIENTATION = 'vertical';
 const HORIZONTAL_ORIENTATION = 'horizontal';
 
+type ACTIVATION_TYPE = 'touch' | 'click';
 @Directive({
     selector: '[ngxVirtualSwiper]'
 })
@@ -49,9 +50,9 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
         this.subscription.unsubscribe();
     }
 
-    @HostListener('mousedown', ['$event']) public onMousedown = (e): void => this.start(e);
+    @HostListener('mousedown', ['$event']) public onMousedown = (e): void => this.start(e, 'click');
 
-    @HostListener('touchstart', ['$event']) public onTouchstart = (e): void => this.start(e);
+    @HostListener('touchstart', ['$event']) public onTouchstart = (e): void => this.start(e, 'touch');
 
     @HostListener('mousemove', ['$event']) public onMousemove = (e): void => this.move(getClickPositions(e));
 
@@ -133,10 +134,10 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
         }
     }
 
-    public start = (e: IPositionEvent): void => {
+    public start = (e: IPositionEvent, activationType: ACTIVATION_TYPE): void => {
         this.swipeBeforeStart.emit(e);
         if (this.enabled) {
-            const position = getTouchPositions(e);
+            const position = activationType === 'touch' ? getTouchPositions(e) : getClickPositions(e);
             this.toggleSwiped(true);
             this.clientX = position.clientX;
             this.clientY = position.clientY;
