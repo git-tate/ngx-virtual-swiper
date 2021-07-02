@@ -21,6 +21,7 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
     @Output() public swipeBeforeStart: EventEmitter<IPositionEvent> = new EventEmitter();
     @Output() public swipeStart: EventEmitter<boolean> = new EventEmitter();
     @Output() public swipeEnd: EventEmitter<boolean> = new EventEmitter();
+    @Output() public swipeAfterEnd: EventEmitter<boolean> = new EventEmitter();
 
     public readonly subscription = new Subscription();
     public index: number;
@@ -64,6 +65,7 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
             this.toggleSwiped(false);
             this.finalize();
         }
+        this.swipeAfterEnd.emit(true);
     }
 
     /** the bug-fix to prevent dragging images while swiping */
@@ -107,7 +109,6 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
                         : Math.abs(value));
                     if (!this._swipeUnlocked ) {
                         this._swipeUnlocked = true;
-                        this.swipeStart.emit(true);
                     }
                     this.clientX = e.clientX;
                 }
@@ -126,7 +127,6 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
                         : value);
                     if (!this._swipeUnlocked ) {
                         this._swipeUnlocked = true;
-                        this.swipeStart.emit(true);
                     }
                     this.clientY = e.clientY;
                 }
@@ -137,6 +137,7 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
     public start = (e: IPositionEvent, activationType: ACTIVATION_TYPE): void => {
         this.swipeBeforeStart.emit(e);
         if (this.enabled) {
+            this.swipeStart.emit(true);
             const position = activationType === 'touch' ? getTouchPositions(e) : getClickPositions(e);
             this.toggleSwiped(true);
             this.clientX = position.clientX;
