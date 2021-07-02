@@ -6,12 +6,12 @@
     "start": "ng serve --port=9900",
     "build": "ng build",
     "build:lib": "ng build ngx-virtual-swiper-plus --prod",
+    "pack": "cd dist/ngx-virtual-swiper-plus && npm pack && cd ../.. && mv dist/ngx-virtual-swiper-plus/ngx-virtual-swiper-plus-*.tgz .",
     "test": "ng test --watch=false",
     "test:lib": "ng test ngx-virtual-swiper-plus --watch=false",
     "test:lib:watch": "ng test ngx-virtual-swiper-plus",
     "lint": "ng lint",
-    "e2e": "ng e2e",
-    "publish": "(npm run build:lib && cd dist/ngx-virtual-swiper-plus && npm pack && npm publish)"
+    "e2e": "ng e2e"
   },
   "private": true,
   "dependencies": {
