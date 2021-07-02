@@ -10,7 +10,8 @@
     "test:lib": "ng test ngx-virtual-swiper-plus --watch=false",
     "test:lib:watch": "ng test ngx-virtual-swiper-plus",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "publish": "(npm run build:lib && cd dist/ngx-virtual-swiper-plus && npm pack && npm publish)"
   },
   "private": true,
   "dependencies": {
