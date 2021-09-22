@@ -90,10 +90,10 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
     }
 
     public get scrollSize(): number {
-        const firstItem = this.cdk.elementRef.nativeElement.querySelector('.ng-scroll-content').children[0];
+        const content = this.cdk.elementRef.nativeElement.querySelector('.ng-scroll-content');
         return this.cdk.getDataLength() * (
             this.itemSize ||
-            (firstItem && (this.rtl ? firstItem.clientWidth : firstItem.clientHeight)) ||
+            (content && (this.rtl ? content.clientWidth : content.clientHeight)) ||
             1
         );
     }
