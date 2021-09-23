@@ -17,6 +17,7 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
 
     @Input() public itemSize: number;
     @Input() public enabled = true;
+    @Input() public scrollbarWidth = 24;
 
     @Output() public swipeBeforeStart: EventEmitter<IPositionEvent> = new EventEmitter();
     @Output() public swipeStart: EventEmitter<boolean> = new EventEmitter();
@@ -141,8 +142,12 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
     }
 
     public start = (e: IPositionEvent, activationType: ACTIVATION_TYPE): void => {
+        const canSwipe = (
+            this.rtl ? e.currentTarget.clientHeight - e.offsetY : e.currentTarget.clientWidth - e.offsetX
+        ) > this.scrollbarWidth;
+
         this.swipeBeforeStart.emit(e);
-        if (this.enabled) {
+        if (this.enabled && canSwipe) {
             this.swipeStart.emit(true);
             const position = activationType === 'touch' ? getTouchPositions(e) : getClickPositions(e);
             this.toggleSwiped(true);
