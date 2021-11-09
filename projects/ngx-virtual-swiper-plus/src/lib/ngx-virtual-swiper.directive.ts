@@ -1,6 +1,6 @@
 import { Directionality } from '@angular/cdk/bidi';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { Directive, EventEmitter, HostListener, Inject, Input, OnDestroy, OnInit, Optional, Output } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, HostListener, Inject, Input, OnDestroy, OnInit, Optional, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { NgxVirtualSwiperOptions } from './options';
 import { IPositionEvent } from './position-event';
@@ -18,6 +18,7 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
     @Input() public itemSize: number;
     @Input() public enabled = true;
     @Input() public scrollbarWidth = 24;
+    @Input() public excludeClasses = [];
 
     @Output() public swipeBeforeStart: EventEmitter<IPositionEvent> = new EventEmitter();
     @Output() public swipeStart: EventEmitter<boolean> = new EventEmitter();
@@ -40,7 +41,8 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
         @Optional() @Inject(Directionality) private dir: Directionality,
         @Inject(NgxVirtualSwiperOptions) private options: NgxVirtualSwiperOptions,
         /** to lean more see https://material.angular.io/cdk/scrolling/api */
-        @Inject(CdkVirtualScrollViewport) private cdk: CdkVirtualScrollViewport
+        @Inject(CdkVirtualScrollViewport) private cdk: CdkVirtualScrollViewport,
+        private el: ElementRef
     ) { }
 
     public ngOnInit(): void {
@@ -142,12 +144,28 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
     }
 
     public start = (e: IPositionEvent, activationType: ACTIVATION_TYPE): void => {
-        const canSwipe = (
+        let canSwipe = (
             this.rtl ? e.currentTarget.clientHeight - e.offsetY : e.currentTarget.clientWidth - e.offsetX
         ) > this.scrollbarWidth;
+        if (!canSwipe) {
+            return;
+        }
+
+        let node = e.currentTarget;
+        while (node !== this.el.nativeElement) {
+            if (this.excludeClasses.some(className => node.classList.contains(className))) {
+                canSwipe = false;
+                break;
+            }
+            node = node.parentElement;
+        }
+
+        if (!canSwipe) {
+            return;
+        }
 
         this.swipeBeforeStart.emit(e);
-        if (this.enabled && canSwipe) {
+        if (this.enabled) {
             this.swipeStart.emit(true);
             const position = activationType === 'touch' ? getTouchPositions(e) : getClickPositions(e);
             this.toggleSwiped(true);
