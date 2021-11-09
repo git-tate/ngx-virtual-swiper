@@ -151,17 +151,19 @@ export class NgxVirtualSwiperDirective implements OnInit, OnDestroy {
             return;
         }
 
-        let node = e.currentTarget;
-        while (node !== this.el.nativeElement) {
-            if (this.excludeClasses.some(className => node.classList.contains(className))) {
-                canSwipe = false;
-                break;
+        if (this.excludeClasses.length) {
+            let node = e.target;
+            while (node !== this.el.nativeElement) {
+                if (this.excludeClasses.some(className => node.classList.contains(className))) {
+                    canSwipe = false;
+                    break;
+                }
+                node = node.parentElement;
             }
-            node = node.parentElement;
-        }
 
-        if (!canSwipe) {
-            return;
+            if (!canSwipe) {
+                return;
+            }
         }
 
         this.swipeBeforeStart.emit(e);
