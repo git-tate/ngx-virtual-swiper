@@ -2,7 +2,7 @@ export interface IPositionEvent {
     clientX: number;
     clientY: number;
     currentTarget: HTMLElement;
-    target: HTMLElement;
+    target?: HTMLElement;
     offsetX: number;
     offsetY: number;
 }
